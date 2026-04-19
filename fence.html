@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fence Paint Patterns</title>
+  <style>
+    body {
+      background: #f5f0e8;
+      font-family: monospace;
+      padding: 24px;
+      color: #444;
+    }
+    h1 {
+      margin-bottom: 24px;
+      font-size: 16px;
+      color: #888;
+    }
+    .pattern-block {
+      margin-bottom: 32px;
+    }
+    .pattern-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+    .fence {
+      display: flex;
+      gap: 3px;
+      align-items: stretch;
+    }
+    .plank {
+      width: 18px;
+      height: 240px;
+      border-radius: 2px 2px 0 0;
+      box-shadow: inset -2px 0 4px rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+    .separator {
+      width: 12px;
+      height: 240px;
+      background: #111;
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+    .download-btn {
+      margin-top: 8px;
+      padding: 3px 10px;
+      font-family: monospace;
+      font-size: 11px;
+      background: #e8e2d8;
+      border: 1px solid #bbb;
+      border-radius: 3px;
+      cursor: pointer;
+      color: #555;
+    }
+    .download-btn:hover {
+      background: #d8d0c4;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Fence Paint Patterns — 46 planks</h1>
+
+<div id="patterns"></div>
+
+<script>
+  const COLORS = { A: '#593d35', B: '#7e3013', C: '#b44f06', D: '#bfa800' };
+
+  const patterns = [
+    { label: 'Pattern 1', str: 'ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDABCDAB' },
+    { label: 'Pattern 2', str: 'AABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCCDDAABBCC' },
+    { label: 'Pattern 3', str: 'AAAABBBBCCCCDDDDAAAABBBBCCCCDDDDAAAABBBBCCCCDD' },
+    { label: 'Pattern 4', str: 'ABCDDCBAABCDDCBAABCDDCBAABCDDCBAABCDDCBAABCDDC' },
+    { label: 'Pattern 5', str: 'BCDCBABCDCBABCDCBABCDCBABCDCBABCDCBABCDCBABCDC' },
+    { label: 'Pattern 6', str: 'ABCADBACBDACBADBCABDACBDACBADBCABDACBDACBADBCA' },
+
+    //                            3  14   15    9        2 6     5    3  5    9
+    { label: 'Pi Number 1', str: 'AAADCCCCDCCCCCBBBBBBBBBDDBBBBBBCCCCCAAACCCCCBB' },
+    { label: 'Pi Number 2', str: 'AAADBBBBDBBBBBCCCCCCCCCDDCCCCCCBBBBBAAABBBBBCC' },
+    { label: 'Pi Number 3', str: 'AAADBBBBDBBBBBCCCCCCCCCDDBBBBBBCCCCCAAACCCCCBB' },
+
+    // B and C prevailing, pinch of A and D
+    { label: 'BC-7: equal BC alternating, A+D sprinkled',    str: 'BCBCABCBCDBCBCBCABCBCBCBCDCBCABCBCBCDBCABCBCBC' },
+    { label: 'BC-8: B dominant, rare A and D',               str: 'BBBCBBBCBBABBBCBBBCBBBBCDBBBCBBBCBBBCBBCBBBCBB' },
+    { label: 'BC-9: C dominant, rare A and D',               str: 'CCBCCCCBCCCBCCCBCCCADCCCBCCCBCCCCBCCCBCCDBCCBC' },
+    { label: 'BC-10: long BC runs, A and D as single accents', str: 'BBBBBCCCCCBBBBBCCCCCBBBBBCCCCCABBBBBCCCCBBBDCC' },
+    { label: 'BC-11: BC alternating, A+D as a pair',         str: 'BCBCBCADCBCBCBCBCBCBCBCBCBCABCBCBCBCBCDBCBCBCB' },
+  ];
+
+  function renderPattern({ label, str }) {
+    const block = document.createElement('div');
+    block.className = 'pattern-block';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'pattern-label';
+    lbl.textContent = `${label}  —  ${str}`;
+    block.appendChild(lbl);
+
+    const fence = document.createElement('div');
+    fence.className = 'fence';
+
+    const SECTIONS = [10, 10, 10, 10, 6];
+    let plankIndex = 0;
+    SECTIONS.forEach((size, si) => {
+      if (si > 0) {
+        const sep = document.createElement('div');
+        sep.className = 'separator';
+        fence.appendChild(sep);
+      }
+      for (let j = 0; j < size; j++, plankIndex++) {
+        const ch = (str[plankIndex] || 'A').toUpperCase();
+        const plank = document.createElement('div');
+        plank.className = 'plank';
+        plank.style.background = COLORS[ch] || '#555';
+        plank.title = `${plankIndex + 1}: ${ch}`;
+        fence.appendChild(plank);
+      }
+    });
+
+    block.appendChild(fence);
+
+    const btn = document.createElement('button');
+    btn.className = 'download-btn';
+    btn.textContent = 'Download PNG';
+    btn.addEventListener('click', () => downloadPattern(label, str));
+    block.appendChild(btn);
+
+    return block;
+  }
+
+  const PLANK_W = 18, PLANK_H = 240, GAP = 3, SEP_W = 12;
+  const SECTIONS = [10, 10, 10, 10, 6];
+
+  function downloadPattern(label, str) {
+    const totalW = SECTIONS.reduce((sum, s) => sum + s * PLANK_W + (s - 1) * GAP, 0)
+                 + (SECTIONS.length - 1) * (GAP + SEP_W + GAP);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = totalW;
+    canvas.height = PLANK_H;
+    const ctx = canvas.getContext('2d');
+
+    let x = 0, pi = 0;
+    SECTIONS.forEach((size, si) => {
+      if (si > 0) {
+        x += GAP;
+        ctx.fillStyle = '#111';
+        ctx.fillRect(x, 0, SEP_W, PLANK_H);
+        x += SEP_W + GAP;
+      }
+      for (let j = 0; j < size; j++, pi++) {
+        if (j > 0) x += GAP;
+        const ch = (str[pi] || 'A').toUpperCase();
+        ctx.fillStyle = COLORS[ch] || '#555';
+        ctx.fillRect(x, 0, PLANK_W, PLANK_H);
+        x += PLANK_W;
+      }
+    });
+
+    const a = document.createElement('a');
+    a.download = `${label.replace(/[^a-z0-9]/gi, '_')}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }
+
+  const container = document.getElementById('patterns');
+  patterns.forEach(p => container.appendChild(renderPattern(p)));
+</script>
+
+</body>
+</html>
