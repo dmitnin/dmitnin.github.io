@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <!-- left + bottom edges with rounded corners -->
+  <path d="M4 8
+           Q4 4 8 4
+           H9
+           M4 8
+           V16
+           Q4 20 8 20
+           H16
+           Q20 20 20 16
+           V15"/>
+
+  <!-- shortened top edge -->
+  <path d="M8 4 H9"/>
+
+  <!-- arrow -->
+  <path d="M11 13 L20 4"/>
+  <path d="M15 4 H20 V9"/>
+
+</svg>
