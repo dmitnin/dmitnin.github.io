@@ -186,13 +186,25 @@
   }
   .item-row:hover { background: #382c14; }
   .item-row.done { background: var(--done-bg); }
-  .item-row.done .item-icon { filter: grayscale(1); opacity: .35; }
 
+
+  .item-icon-wrap {
+    position: relative;
+    width: 32px; height: 32px;
+    flex-shrink: 0;
+  }
   .item-icon {
     width: 32px; height: 32px;
     image-rendering: pixelated;
-    flex-shrink: 0;
+    display: block;
   }
+  .item-quality-star {
+    position: absolute;
+    bottom: -3px; left: -3px;
+    width: 16px; height: 16px;
+    image-rendering: pixelated;
+  }
+  .item-row.done .item-icon-wrap { filter: grayscale(1); opacity: .35; }
 
   .item-text { flex: 1; min-width: 0; }
 
@@ -798,12 +810,20 @@ function buildItem(item, key, opts = {}) {
   const cb = el('input', {type:'checkbox', className:'cb'});
   cb.checked = checked;
 
-  // Optional icon
+  // Optional icon (with quality star overlay)
+  const QUALITY_STAR = { Silver: 'Silver_Quality_Icon.png', Gold: 'Gold_Quality_Icon.png' };
   const iconFile = ICONS[item.name];
   if (iconFile) {
+    const wrap = document.createElement('div');
+    wrap.className = 'item-icon-wrap';
     const img = el('img', {className:'item-icon', src:'img/'+iconFile, alt:''});
-    img.onerror = () => img.style.display = 'none';
-    row.append(cb, img);
+    img.onerror = () => wrap.style.display = 'none';
+    wrap.appendChild(img);
+    if (item.quality && QUALITY_STAR[item.quality]) {
+      wrap.appendChild(el('img', {className:'item-quality-star',
+        src: 'img/' + QUALITY_STAR[item.quality], alt: item.quality}));
+    }
+    row.append(cb, wrap);
   } else {
     row.appendChild(cb);
   }
