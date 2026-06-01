@@ -135,7 +135,7 @@
     color: rgba(255,255,255,.65);
     font-style: italic;
   }
-  .room-caret { font-size: 12px; color: rgba(255,255,255,.5); margin-left: 6px; }
+  .room-caret { font-size: 19px; font-weight: 700; color: #fff; }
 
   .room-body {
     border: 1px solid var(--border);
@@ -161,7 +161,9 @@
   }
   .bundle-hdr.done { opacity: .35; }
 
-  .bundle-name { font-size: 13px; font-weight: 700; color: #c8a050; }
+  .bundle-caret { font-size: 13px; font-weight: 700; color: #c8a050; }
+  .bundle-name  { font-size: 13px; font-weight: 700; color: #c8a050; }
+  .bundle-hdr.done .bundle-caret,
   .bundle-hdr.done .bundle-name { text-decoration: line-through; color: var(--done-fg); }
 
   .bundle-reward { font-size: 11px; color: var(--muted); margin-left: 6px; }
@@ -542,10 +544,10 @@ function buildRoom(room) {
   hdr.className = 'room-hdr';
   hdr.style.background = room.color;
 
-  const title = el('span', {className:'room-title'}, room.name);
+  const caret  = el('span', {className:'room-caret'}, '▼');
+  const title  = el('span', {className:'room-title'}, room.name);
   const reward = el('span', {className:'room-reward'}, '→ ' + room.reward);
-  const caret  = el('span', {className:'room-caret'}, '▾');
-  hdr.append(title, reward, caret);
+  hdr.append(caret, title, reward);
 
   // Body
   const body = document.createElement('div');
@@ -554,7 +556,7 @@ function buildRoom(room) {
 
   hdr.addEventListener('click', () => {
     const collapsed = body.classList.toggle('collapsed');
-    caret.textContent = collapsed ? '▸' : '▾';
+    caret.textContent = collapsed ? '▶' : '▼';
   });
 
   sec.append(hdr, body);
@@ -572,8 +574,9 @@ function buildBundle(bundle) {
   const hdr = document.createElement('div');
   hdr.className = 'bundle-hdr';
 
-  const name = el('span', {className:'bundle-name'}, bundle.name);
-  hdr.append(name);
+  const bcaret = el('span', {className:'bundle-caret'}, '▼');
+  const name   = el('span', {className:'bundle-name'},   bundle.name);
+  hdr.append(bcaret, name);
 
   if (bundle.reward) {
     hdr.appendChild(el('span', {className:'bundle-reward'}, '↩ ' + bundle.reward));
@@ -592,7 +595,10 @@ function buildBundle(bundle) {
     body.appendChild(buildItem(item, skey(bundle.id, idx)));
   });
 
-  hdr.addEventListener('click', () => body.classList.toggle('collapsed'));
+  hdr.addEventListener('click', () => {
+    const collapsed = body.classList.toggle('collapsed');
+    bcaret.textContent = collapsed ? '▶' : '▼';
+  });
 
   div.append(hdr, body);
   computeBundle(div);
