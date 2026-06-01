@@ -120,10 +120,12 @@
     gap: 10px;
     padding: 10px 18px;
     border-radius: 8px 8px 0 0;
+    transition: border-radius 0s;
     cursor: pointer;
     user-select: none;
     transition: opacity .25s;
   }
+  .room-hdr.collapsed { border-radius: 8px; }
   .room-hdr.done { opacity: .4; }
 
   .room-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: .04em; }
@@ -209,6 +211,27 @@
     margin-top: 1px;
   }
   .item-row.done .item-obtain { color: #444; }
+  .item-bundle-tag { font-size: 11px; color: #7ba8d0; font-style: italic; margin-top: 1px; }
+  .item-row.done .item-bundle-tag { color: #444; }
+
+  /* ── Seasonal separator ──────────────────────────────────────────────── */
+  .season-sep {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 36px 0 24px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+  }
+  .season-sep::before, .season-sep::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
 </style>
 </head>
 <body>
@@ -466,6 +489,143 @@ const ROOMS = [
   },
 ];
 
+// ── Seasonal guide data ───────────────────────────────────────────────────
+// keys: [bundleId, itemIndex] pairs — resolved against ROOMS at render time
+const SEASONS = [
+  {
+    id: 'spring', name: '🌸 Spring', color: '#4a8840',
+    sections: [
+      { name: '🌱 Plant', type: 'items', keys: [
+        ['spring-crops',0],['spring-crops',1],['spring-crops',2],['spring-crops',3],
+        ['quality-crops',0],
+        ['artisan',7],['artisan',11],   // Apricot, Cherry (fruit trees)
+      ]},
+      { name: '🍃 Forage', type: 'items', keys: [
+        ['spring-foraging',0],['spring-foraging',1],['spring-foraging',2],['spring-foraging',3],
+        ['exotic-foraging',8],          // Morel (Secret Woods, Spring)
+      ]},
+      { name: '🎣 Fishing', type: 'items', keys: [
+        ['river-fish',0],               // Sunfish
+        ['river-fish',1],               // Catfish (Spring+Fall, rain)
+        ['river-fish',2],               // Shad (Spring–Fall, rain)
+        ['night-fishing',2],            // Eel (Spring+Fall, ocean, rain)
+        ['ocean-fish',0],               // Sardine (Spring/Fall/Winter)
+      ]},
+      { name: '✅ To-Do', type: 'todos', items: [
+        'Plant fruit trees — takes 28 days to mature; Cherry & Apricot fruit in Spring, Orange & Peach in Summer, Apple & Pomegranate in Fall',
+        'Egg Festival Day 13 — buy Strawberry Seeds from Pierre',
+        "Set up Tappers on Oak (Oak Resin) and Maple (Maple Syrup) trees",
+        "Start mining Copper & Iron for Blacksmith's Bundle",
+        'Collect all Spring Foraging before end of Spring 28 — items disappear',
+      ]},
+    ],
+  },
+  {
+    id: 'summer', name: '☀️ Summer', color: '#a05820',
+    sections: [
+      { name: '🌱 Plant', type: 'items', keys: [
+        ['summer-crops',0],['summer-crops',1],['summer-crops',2],['summer-crops',3],
+        ['quality-crops',1],            // Melon ×5 Gold
+        ['fodder',0],                   // Wheat ×10
+        ['chefs',3],                    // Poppy
+        ['dye',2],                      // Sunflower (Summer+Fall)
+        ['dye',5],                      // Red Cabbage (Year 2+, Summer only)
+        ['artisan',8],['artisan',9],    // Orange, Peach (fruit trees)
+      ]},
+      { name: '🍃 Forage', type: 'items', keys: [
+        ['summer-foraging',0],['summer-foraging',1],['summer-foraging',2],
+        ['chefs',1],                    // Fiddlehead Fern (Secret Woods)
+        ['dye',0],                      // Red Mushroom (Summer+Fall)
+        ['dye',1],                      // Sea Urchin (beach)
+      ]},
+      { name: '🎣 Fishing', type: 'items', keys: [
+        ['specialty-fish',0],           // Pufferfish (ocean, sunny, 12–4pm)
+        ['ocean-fish',1],               // Tuna (Summer+Winter)
+        ['ocean-fish',2],               // Red Snapper (Summer+Fall, rain)
+        ['ocean-fish',3],               // Tilapia (Summer+Fall)
+        ['specialty-fish',3],           // Woodskip (Secret Woods, any)
+        ['lake-fish',0],                // Largemouth Bass (any)
+        ['specialty-fish',1],           // Ghostfish (Mines ponds, any)
+        ['specialty-fish',2],           // Sandfish (Desert)
+      ]},
+      { name: '✅ To-Do', type: 'todos', items: [
+        'Set up Bee Houses for Honey (Artisan Bundle)',
+        "Build Big Barn → buy Goat for Goat Cheese, Large Goat Milk",
+        "Build Deluxe Coop → buy Duck for Duck Feather; Rabbit for Rabbit's Foot",
+        'Set up Kegs & Preserve Jars for Artisan goods',
+        'Place Crab Pots in river/ocean — need 5 of 10 crustaceans',
+      ]},
+    ],
+  },
+  {
+    id: 'fall', name: '🍂 Fall', color: '#8a3a10',
+    sections: [
+      { name: '🌱 Plant', type: 'items', keys: [
+        ['fall-crops',0],['fall-crops',1],['fall-crops',2],['fall-crops',3],
+        ['quality-crops',2],['quality-crops',3],// Pumpkin×5 Gold, Corn×5 Gold
+        ['dye',2],                      // Sunflower (also Summer)
+        ['artisan',6],                  // Apple → Artisan Bundle
+        ['fodder',2],                   // Apple ×3 → Fodder Bundle
+        ['artisan',10],                 // Pomegranate → Artisan Bundle
+        ['enchanters',3],               // Pomegranate → Enchanter's Bundle
+        ['chefs',2],                    // Truffle (Pig, non-winter!)
+      ]},
+      { name: '🍃 Forage', type: 'items', keys: [
+        ['fall-foraging',0],['fall-foraging',1],['fall-foraging',2],['fall-foraging',3],
+        ['exotic-foraging',4],          // Purple Mushroom → Exotic Foraging
+        ['field-research',0],           // Purple Mushroom → Field Research
+        ['dye',0],                      // Red Mushroom → Dye Bundle
+        ['exotic-foraging',3],          // Red Mushroom → Exotic Foraging
+      ]},
+      { name: '🎣 Fishing', type: 'items', keys: [
+        ['river-fish',1],               // Catfish (Spring+Fall, rain)
+        ['night-fishing',0],            // Walleye (Fall, rain)
+        ['river-fish',3],               // Tiger Trout (Fall+Winter)
+        ['ocean-fish',2],               // Red Snapper (also Summer)
+        ['ocean-fish',3],               // Tilapia (also Summer)
+      ]},
+      { name: '✅ To-Do', type: 'todos', items: [
+        'Get Truffle from Pig before Winter — pigs do not leave the barn in Winter!',
+        "Collect Duck Feather — high friendship Duck (random drop)",
+        "Collect Rabbit's Foot — max friendship Rabbit in Deluxe Coop",
+        'Fill Kegs with Wine/Juice before crops die on Fall 28',
+        'Stockpile Hay ×10 for Fodder Bundle',
+        'Save 42,500g total for all four Vault Bundles',
+        'Plant fruit trees now so they fruit next year',
+      ]},
+    ],
+  },
+  {
+    id: 'winter', name: '❄️ Winter', color: '#2858a0',
+    sections: [
+      { name: '🍃 Forage', type: 'items', keys: [
+        ['winter-foraging',0],['winter-foraging',1],['winter-foraging',2],['winter-foraging',3],
+        ['field-research',1],           // Nautilus Shell (Winter Beach)
+      ]},
+      { name: '🎣 Fishing', type: 'items', keys: [
+        ['ocean-fish',1],               // Tuna (Summer+Winter)
+        ['lake-fish',3],                // Sturgeon (Summer+Winter)
+        ['river-fish',3],               // Tiger Trout (Fall+Winter)
+        ['night-fishing',1],            // Bream (all seasons)
+        ['lake-fish',0],                // Largemouth Bass (all seasons)
+        ['lake-fish',1],                // Carp (all seasons)
+        ['lake-fish',2],                // Bullhead (all seasons)
+        ['ocean-fish',0],               // Sardine (Spring/Fall/Winter)
+      ]},
+      { name: '✅ To-Do', type: 'todos', items: [
+        "Mines floors 1–39: collect Quartz & Earth Crystal (Geologist's Bundle)",
+        'Mines floors 40–79: collect Frozen Tear & Frozen Geode (Field Research)',
+        "Mines floors 80–119: collect Fire Quartz & smelt Gold Bars (Geologist's + Blacksmith's)",
+        "Kill Slimes ×99 — Adventurer's Bundle (floors 1–39)",
+        "Kill Bats ×10 — Adventurer's Bundle (floors 40–79)",
+        'Kill Ghosts or Metal Heads for Solar Essence',
+        'Kill Shadow Brutes or Shamans for Void Essence',
+        'Check Traveling Cart (Fri & Sun) for Red Cabbage, Rabbit\'s Foot, rare items',
+      ]},
+    ],
+  },
+];
+
 // ── Icon map (item name → img/ filename) ─────────────────────────────────
 const ICONS = {
   'Wild Horseradish':'Wild_Horseradish.png','Daffodil':'Daffodil.png','Leek':'Leek.png',
@@ -521,15 +681,22 @@ function render() {
   const nav  = document.getElementById('nav');
 
   ROOMS.forEach(room => {
-    // Nav link
     const a = document.createElement('a');
     a.href = '#' + room.id;
     a.textContent = room.name;
     a.style.background = room.color;
     nav.appendChild(a);
-
     main.appendChild(buildRoom(room));
   });
+
+  buildItemLookup();
+
+  const sep = document.createElement('div');
+  sep.className = 'season-sep';
+  sep.innerHTML = '<span>Seasonal Guide</span>';
+  main.appendChild(sep);
+
+  SEASONS.forEach(season => main.appendChild(buildSeason(season)));
 
   updateProgress();
 }
@@ -556,6 +723,7 @@ function buildRoom(room) {
 
   hdr.addEventListener('click', () => {
     const collapsed = body.classList.toggle('collapsed');
+    hdr.classList.toggle('collapsed', collapsed);
     caret.textContent = collapsed ? '▶' : '▼';
   });
 
@@ -567,8 +735,9 @@ function buildRoom(room) {
 function buildBundle(bundle) {
   const div = document.createElement('div');
   div.className = 'bundle';
-  div.dataset.needed = bundle.needed;
-  div.dataset.total  = bundle.items.length;
+  div.dataset.bundleId = bundle.id;
+  div.dataset.needed   = bundle.needed;
+  div.dataset.total    = bundle.items.length;
 
   // Header
   const hdr = document.createElement('div');
@@ -605,11 +774,26 @@ function buildBundle(bundle) {
   return div;
 }
 
-function buildItem(item, key) {
+function syncRows(key, on) {
+  document.querySelectorAll(`.item-row[data-item-key="${key}"]`).forEach(r => {
+    r.classList.toggle('done', on);
+    const cb = r.querySelector('.cb');
+    if (cb) cb.checked = on;
+  });
+}
+
+function bundleElForKey(key) {
+  if (key.startsWith('sdv_todo_')) return null;
+  const bundleId = key.replace(/^sdv_/, '').replace(/_\d+$/, '');
+  return document.querySelector(`.bundle[data-bundle-id="${bundleId}"]`);
+}
+
+function buildItem(item, key, opts = {}) {
   const checked = localStorage.getItem(key) === '1';
 
   const row = document.createElement('div');
   row.className = 'item-row' + (checked ? ' done' : '');
+  row.dataset.itemKey = key;
 
   const cb = el('input', {type:'checkbox', className:'cb'});
   cb.checked = checked;
@@ -635,17 +819,14 @@ function buildItem(item, key) {
   if (item.quality) main.appendChild(el('span', {className:'item-quality'}, item.quality + '+'));
   text.appendChild(main);
 
-  if (item.obtain) {
-    text.appendChild(el('div', {className:'item-obtain'}, item.obtain));
-  }
+  if (item.obtain) text.appendChild(el('div', {className:'item-obtain'}, item.obtain));
+  if (opts.bundleName) text.appendChild(el('div', {className:'item-bundle-tag'}, '→ ' + opts.bundleName));
   row.appendChild(text);
 
   const toggle = (on) => {
     localStorage.setItem(key, on ? '1' : '0');
-    row.classList.toggle('done', on);
-    computeBundle(row.closest('.bundle'));
-    computeRoom(row.closest('.room'));
-    updateProgress();
+    syncRows(key, on);
+    afterToggle(key);
   };
 
   row.addEventListener('click', e => { if (e.target === cb) return; cb.checked = !cb.checked; toggle(cb.checked); });
@@ -672,16 +853,49 @@ function computeBundle(bundleEl) {
 }
 
 function computeRoom(roomEl) {
-  const bundles = roomEl.querySelectorAll('.bundle');
+  const bundles = roomEl.querySelectorAll('.bundle[data-bundle-id]');
   const allDone = [...bundles].every(b => b.querySelector('.bundle-hdr').classList.contains('done'));
   const hdr = roomEl.querySelector('.room-hdr');
   hdr.classList.toggle('done', allDone);
 }
 
+function computeSeasonSection(secEl) {
+  const rows = secEl.querySelectorAll('.item-row');
+  const done = rows.length > 0 && [...rows].every(r => r.classList.contains('done'));
+  secEl.querySelector('.bundle-hdr').classList.toggle('done', done);
+}
+
+function computeSeason(seasonEl) {
+  const secs = seasonEl.querySelectorAll('.bundle:not([data-bundle-id])');
+  const done = secs.length > 0 && [...secs].every(s => s.querySelector('.bundle-hdr').classList.contains('done'));
+  seasonEl.querySelector('.room-hdr').classList.toggle('done', done);
+}
+
+function afterToggle(key) {
+  const bundleEl = bundleElForKey(key);
+  if (bundleEl) {
+    computeBundle(bundleEl);
+    computeRoom(bundleEl.closest('.room'));
+  }
+  document.querySelectorAll(`.bundle:not([data-bundle-id]) .item-row[data-item-key="${key}"]`).forEach(row => {
+    const sec = row.closest('.bundle');
+    if (sec) {
+      computeSeasonSection(sec);
+      computeSeason(sec.closest('.room'));
+    }
+  });
+  updateProgress();
+}
+
 function updateProgress() {
-  const all  = document.querySelectorAll('.item-row').length;
-  const done = document.querySelectorAll('.item-row.done').length;
-  const pct  = all ? Math.round(done / all * 100) : 0;
+  const allKeys = new Set(), doneKeys = new Set();
+  document.querySelectorAll('.item-row[data-item-key]').forEach(r => {
+    const k = r.dataset.itemKey;
+    allKeys.add(k);
+    if (r.classList.contains('done')) doneKeys.add(k);
+  });
+  const all = allKeys.size, done = doneKeys.size;
+  const pct = all ? Math.round(done / all * 100) : 0;
   document.getElementById('prog-label').textContent = `${done} / ${all} items`;
   document.getElementById('prog-bar').style.width = pct + '%';
 }
@@ -693,9 +907,118 @@ function resetAll() {
     r.classList.remove('done');
     r.querySelector('.cb').checked = false;
   });
-  document.querySelectorAll('.bundle').forEach(b => computeBundle(b));
-  document.querySelectorAll('.room').forEach(r => computeRoom(r));
+  document.querySelectorAll('.bundle[data-bundle-id]').forEach(b => computeBundle(b));
+  document.querySelectorAll('.bundle:not([data-bundle-id])').forEach(s => computeSeasonSection(s));
+  document.querySelectorAll('.room').forEach(r => {
+    if (r.querySelector('.bundle[data-bundle-id]')) computeRoom(r);
+    else computeSeason(r);
+  });
   updateProgress();
+}
+
+// ── Season rendering ─────────────────────────────────────────────────────
+let itemLookup = {};
+
+function buildItemLookup() {
+  ROOMS.forEach(room => {
+    room.bundles.forEach(bundle => {
+      bundle.items.forEach((item, idx) => {
+        itemLookup[skey(bundle.id, idx)] = { ...item, bundleName: bundle.name };
+      });
+    });
+  });
+}
+
+function buildSeason(season) {
+  const sec = document.createElement('section');
+  sec.className = 'room';
+  sec.id = season.id;
+
+  const hdr = document.createElement('div');
+  hdr.className = 'room-hdr';
+  hdr.style.background = season.color;
+
+  const caret = el('span', {className:'room-caret'}, '▼');
+  const title = el('span', {className:'room-title'}, season.name);
+  hdr.append(caret, title);
+
+  const body = document.createElement('div');
+  body.className = 'room-body';
+  season.sections.forEach(sec => body.appendChild(buildSeasonSection(sec, season.id)));
+
+  hdr.addEventListener('click', () => {
+    const collapsed = body.classList.toggle('collapsed');
+    hdr.classList.toggle('collapsed', collapsed);
+    caret.textContent = collapsed ? '▶' : '▼';
+  });
+
+  sec.append(hdr, body);
+  computeSeason(sec);
+  return sec;
+}
+
+function buildSeasonSection(section, seasonId) {
+  const div = document.createElement('div');
+  div.className = 'bundle';   // reuse bundle styles (no data-bundle-id → excluded from completion logic)
+
+  const hdr = document.createElement('div');
+  hdr.className = 'bundle-hdr';
+
+  const bcaret = el('span', {className:'bundle-caret'}, '▼');
+  const name   = el('span', {className:'bundle-name'},   section.name);
+  hdr.append(bcaret, name);
+
+  const body = document.createElement('div');
+  body.className = 'bundle-body';
+
+  if (section.type === 'items') {
+    section.keys.forEach(([bundleId, idx]) => {
+      const key  = skey(bundleId, idx);
+      const item = itemLookup[key];
+      if (item) body.appendChild(buildItem(item, key, {bundleName: item.bundleName}));
+    });
+  } else {
+    section.items.forEach((text, idx) => {
+      body.appendChild(buildTodo(text, `sdv_todo_${seasonId}_${idx}`));
+    });
+  }
+
+  hdr.addEventListener('click', () => {
+    const collapsed = body.classList.toggle('collapsed');
+    bcaret.textContent = collapsed ? '▶' : '▼';
+  });
+
+  div.append(hdr, body);
+  computeSeasonSection(div);
+  return div;
+}
+
+function buildTodo(text, key) {
+  const checked = localStorage.getItem(key) === '1';
+  const row = document.createElement('div');
+  row.className = 'item-row' + (checked ? ' done' : '');
+  row.dataset.itemKey = key;
+
+  const cb = el('input', {type:'checkbox', className:'cb'});
+  cb.checked = checked;
+  row.appendChild(cb);
+
+  const textDiv = document.createElement('div');
+  textDiv.className = 'item-text';
+  const mainDiv = document.createElement('div');
+  mainDiv.className = 'item-main';
+  mainDiv.appendChild(el('span', {className:'item-name'}, text));
+  textDiv.appendChild(mainDiv);
+  row.appendChild(textDiv);
+
+  const toggle = (on) => {
+    localStorage.setItem(key, on ? '1' : '0');
+    syncRows(key, on);
+    afterToggle(key);
+  };
+  row.addEventListener('click', e => { if (e.target === cb) return; cb.checked = !cb.checked; toggle(cb.checked); });
+  cb.addEventListener('change', () => toggle(cb.checked));
+  return row;
 }
 
 // ── Tiny helper ───────────────────────────────────────────────────────────
