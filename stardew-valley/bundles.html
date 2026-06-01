@@ -125,7 +125,6 @@
     transition: opacity .25s;
   }
   .room-hdr.done { opacity: .4; }
-  .room-hdr .cb { width: 17px; height: 17px; pointer-events: none; }
 
   .room-title { font-size: 19px; font-weight: 700; color: #fff; letter-spacing: .04em; }
   .room-hdr.done .room-title { text-decoration: line-through; }
@@ -161,7 +160,6 @@
     transition: opacity .25s;
   }
   .bundle-hdr.done { opacity: .35; }
-  .bundle-hdr .cb { pointer-events: none; }
 
   .bundle-name { font-size: 13px; font-weight: 700; color: #c8a050; }
   .bundle-hdr.done .bundle-name { text-decoration: line-through; color: var(--done-fg); }
@@ -176,7 +174,7 @@
   /* ── Item row ────────────────────────────────────────────────────────── */
   .item-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
     padding: 5px 16px 5px 32px;
     cursor: pointer;
@@ -184,12 +182,12 @@
   }
   .item-row:hover { background: #382c14; }
   .item-row.done { background: var(--done-bg); }
+  .item-row.done .item-icon { filter: grayscale(1); opacity: .35; }
 
   .item-icon {
     width: 32px; height: 32px;
     image-rendering: pixelated;
     flex-shrink: 0;
-    margin-top: 2px;
   }
 
   .item-text { flex: 1; min-width: 0; }
@@ -309,8 +307,8 @@ const ROOMS = [
       ]},
       { id: 'animal', name: 'Animal Bundle', reward: 'Cheese Press ×1', needed: 5, items: [
         { name: 'Large Milk',      obtain: 'Cows' },
-        { name: 'Large Egg',       obtain: 'Brown Chickens' },
-        { name: 'Large Egg',       obtain: 'White Chickens' },
+        { name: 'Large Egg (Brown)', obtain: 'Brown Chickens' },
+        { name: 'Large Egg',        obtain: 'White Chickens' },
         { name: 'Large Goat Milk', obtain: 'Goats' },
         { name: 'Wool',            obtain: 'Sheep, Rabbits' },
         { name: 'Duck Egg',        obtain: 'Ducks' },
@@ -474,12 +472,16 @@ const ICONS = {
   'Blackberry':'Blackberry.png','Winter Root':'Winter_Root.png','Crystal Fruit':'Crystal_Fruit.png',
   'Snow Yam':'Snow_Yam.png','Crocus':'Crocus.png','Red Mushroom':'Red_Mushroom.png',
   'Purple Mushroom':'Purple_Mushroom.png','Maple Syrup':'Maple_Syrup.png','Oak Resin':'Oak_Resin.png',
-  'Pine Tar':'Pine_Tar.png',
+  'Pine Tar':'Pine_Tar.png','Morel':'Morel.png','Sweet Pea':'Sweet_Pea.png',
+  'Coconut':'Coconut.png','Cactus Fruit':'Cactus_Fruit.png','Cave Carrot':'Cave_Carrot.png',
+  'Wood':'Wood.png','Stone':'Stone.png','Hardwood':'Hardwood.png','Hay':'Hay.png',
+  'Dinosaur Mayonnaise':'Dinosaur_Mayonnaise.png','Prismatic Shard':'Prismatic_Shard.png',
+  'Ancient Fruit':'Ancient_Fruit.png','Void Salmon':'Void_Salmon.png','Caviar':'Caviar.png',
   'Parsnip':'Parsnip.png','Green Bean':'Green_Bean.png','Cauliflower':'Cauliflower.png',
   'Potato':'Potato.png','Tomato':'Tomato.png','Hot Pepper':'Hot_Pepper.png',
   'Blueberry':'Blueberry.png','Melon':'Melon.png','Corn':'Corn.png','Eggplant':'Eggplant.png',
   'Pumpkin':'Pumpkin.png','Yam':'Yam.png',
-  'Large Milk':'Large_Milk.png','Large Egg':'Large_Egg.png','Large Goat Milk':'Large_Goat_Milk.png',
+  'Large Milk':'Large_Milk.png','Large Egg':'Large_Egg.png','Large Egg (Brown)':'Large_Brown_Egg.png','Large Goat Milk':'Large_Goat_Milk.png',
   'Wool':'Wool.png','Duck Egg':'Duck_Egg.png',
   'Truffle Oil':'Truffle_Oil.png','Cloth':'Cloth.png','Goat Cheese':'Goat_Cheese.png',
   'Cheese':'Cheese.png','Honey':'Honey.png','Jelly':'Jelly.png',
@@ -540,11 +542,10 @@ function buildRoom(room) {
   hdr.className = 'room-hdr';
   hdr.style.background = room.color;
 
-  const cb = el('input', {type:'checkbox', className:'cb'});
   const title = el('span', {className:'room-title'}, room.name);
   const reward = el('span', {className:'room-reward'}, '→ ' + room.reward);
   const caret  = el('span', {className:'room-caret'}, '▾');
-  hdr.append(cb, title, reward, caret);
+  hdr.append(title, reward, caret);
 
   // Body
   const body = document.createElement('div');
@@ -571,9 +572,8 @@ function buildBundle(bundle) {
   const hdr = document.createElement('div');
   hdr.className = 'bundle-hdr';
 
-  const cb     = el('input', {type:'checkbox', className:'cb'});
-  const name   = el('span',  {className:'bundle-name'}, bundle.name);
-  hdr.append(cb, name);
+  const name = el('span', {className:'bundle-name'}, bundle.name);
+  hdr.append(name);
 
   if (bundle.reward) {
     hdr.appendChild(el('span', {className:'bundle-reward'}, '↩ ' + bundle.reward));
@@ -656,7 +656,6 @@ function computeBundle(bundleEl) {
 
   const hdr = bundleEl.querySelector('.bundle-hdr');
   hdr.classList.toggle('done', done);
-  hdr.querySelector('.cb').checked = done;
 
   const prog = hdr.querySelector('.bundle-prog');
   if (needed < total) {
@@ -671,7 +670,6 @@ function computeRoom(roomEl) {
   const allDone = [...bundles].every(b => b.querySelector('.bundle-hdr').classList.contains('done'));
   const hdr = roomEl.querySelector('.room-hdr');
   hdr.classList.toggle('done', allDone);
-  hdr.querySelector('.cb').checked = allDone;
 }
 
 function updateProgress() {
