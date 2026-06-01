@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stardew Valley — Bundle Cheatsheet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+  :root {
+    --spring:  #5db85c;
+    --summer:  #e07b39;
+    --fall:    #c0582a;
+    --winter:  #5b8fc7;
+    --special: #9b59b6;
+    --bg:      #1a1409;
+    --card:    #2c2010;
+    --border:  #5a3e1b;
+    --text:    #f0ddb0;
+    --muted:   #a08050;
+    --done-bg: #111;
+    --done-text:#555;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  header {
+    background: #0d0b06;
+    border-bottom: 2px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 { font-size: 20px; color: #f5c842; letter-spacing: .04em; }
+  header small { color: var(--muted); font-size: 12px; }
+
+  nav {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  nav a {
+    text-decoration: none;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    transition: opacity .15s;
+  }
+  nav a:hover { opacity: .8; }
+  nav a.spring  { background: var(--spring);  color: #fff; }
+  nav a.summer  { background: var(--summer);  color: #fff; }
+  nav a.fall    { background: var(--fall);    color: #fff; }
+  nav a.winter  { background: var(--winter);  color: #fff; }
+  nav a.special { background: var(--special); color: #fff; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  .season-block { margin-bottom: 48px; }
+
+  .season-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    border-radius: 8px 8px 0 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .season-header.spring  { background: var(--spring); }
+  .season-header.summer  { background: var(--summer); }
+  .season-header.fall    { background: var(--fall); }
+  .season-header.winter  { background: var(--winter); }
+  .season-header.special { background: var(--special); }
+
+  .season-body {
+    border: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .subsection { border-bottom: 1px solid var(--border); }
+  .subsection:last-child { border-bottom: none; }
+
+  .subsection-title {
+    background: #221808;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: #c8a050;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .subsection-title::after { content: '▾'; font-size: 12px; }
+  .subsection-title.collapsed::after { content: '▸'; }
+
+  .subsection-content { padding: 4px 0; }
+  .subsection-content.hidden { display: none; }
+
+  .item-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 16px;
+    border-radius: 4px;
+    transition: background .1s;
+    cursor: pointer;
+  }
+  .item-row:hover { background: #382c14; }
+  .item-row.checked { background: var(--done-bg); opacity: .5; }
+  .item-row.checked .item-name { text-decoration: line-through; color: var(--done-text); }
+  .item-row.checked .item-bundle { color: #444; }
+
+  .item-row input[type=checkbox] {
+    appearance: none;
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    background: var(--card);
+  }
+  .item-row input[type=checkbox]:checked { background: #5a3e1b; border-color: #c8a050; }
+  .item-row input[type=checkbox]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: -2px; left: 2px;
+    font-size: 12px;
+    color: #f5c842;
+  }
+
+  .item-icon { width: 48px; height: 48px; image-rendering: pixelated; flex-shrink: 0; }
+  .item-name { font-weight: 700; color: var(--text); min-width: 160px; }
+  .item-bundle { color: var(--muted); font-size: 12px; }
+  .item-note { color: #e07b39; font-size: 12px; font-style: italic; margin-left: auto; }
+
+  .badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; white-space: nowrap; }
+  .badge.year2 { background: #5a1e8a; color: #ddaaff; }
+  .badge.rare  { background: #1a4a6a; color: #aaddff; }
+
+  .todo-list { padding: 8px 16px 8px 32px; }
+  .todo-list li { padding: 3px 0; color: var(--text); font-size: 13px; }
+  .todo-list li span.hl { color: #f5c842; font-weight: 700; }
+
+  .progress-wrap {
+    margin: 12px 0 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-bar-outer { flex: 1; height: 8px; background: #111; border-radius: 4px; overflow: hidden; }
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #5db85c, #f5c842);
+    border-radius: 4px;
+    transition: width .3s;
+  }
+  .progress-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .reset-btn {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+  }
+  .reset-btn:hover { color: var(--text); border-color: var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🌾 Stardew Valley — Bundle Cheatsheet</h1>
+    <small>Community Center · tick items as you collect them</small>
+  </div>
+  <nav>
+    <a href="#spring"  class="spring" >🌸 Spring</a>
+    <a href="#summer"  class="summer" >☀️ Summer</a>
+    <a href="#fall"    class="fall"   >🍂 Fall</a>
+    <a href="#winter"  class="winter" >❄️ Winter</a>
+    <a href="#special" class="special">⭐ Special</a>
+  </nav>
+</header>
+
+<main>
+<div class="progress-wrap">
+  <span class="progress-label" id="prog-label">0 / 0 items checked</span>
+  <div class="progress-bar-outer"><div class="progress-bar-inner" id="prog-bar" style="width:0%"></div></div>
+  <button class="reset-btn" onclick="resetAll()">Reset All</button>
+</div>
+
+<div class="season-block" id="spring">
+  <div class="season-header spring">🌸 Spring</div>
+  <div class="season-body" id="spring-body"></div>
+</div>
+<div class="season-block" id="summer">
+  <div class="season-header summer">☀️ Summer</div>
+  <div class="season-body" id="summer-body"></div>
+</div>
+<div class="season-block" id="fall">
+  <div class="season-header fall">🍂 Fall</div>
+  <div class="season-body" id="fall-body"></div>
+</div>
+<div class="season-block" id="winter">
+  <div class="season-header winter">❄️ Winter</div>
+  <div class="season-body" id="winter-body"></div>
+</div>
+<div class="season-block" id="special">
+  <div class="season-header special">⭐ Special &amp; Year-Round Items</div>
+  <div class="season-body" id="special-body"></div>
+</div>
+</main>
+
+<script>
+function img(file) { return 'img/' + file; }
+
+const data = {
+  spring: {
+    plant: [
+      { name:'Parsnip',         icon:'Parsnip.png',            bundle:'Spring Crops Bundle' },
+      { name:'Green Bean',      icon:'Green_Bean.png',          bundle:'Spring Crops Bundle' },
+      { name:'Cauliflower',     icon:'Cauliflower.png',         bundle:'Spring Crops Bundle' },
+      { name:'Potato',          icon:'Potato.png',              bundle:'Spring Crops Bundle' },
+      { name:'Gold Parsnip ×5', icon:'Gold_Quality_Icon.png',   bundle:'Quality Crops Bundle', note:'Need gold ★' },
+      { name:'Strawberry',      icon:'Strawberry.png',          bundle:'Artisan → Jelly', note:'Egg Festival Day 13' },
+    ],
+    forage: [
+      { name:'Wild Horseradish', icon:'Wild_Horseradish.png', bundle:'Spring Foraging Bundle' },
+      { name:'Daffodil',         icon:'Daffodil.png',          bundle:'Spring Foraging Bundle' },
+      { name:'Leek',             icon:'Leek.png',              bundle:'Spring Foraging Bundle' },
+      { name:'Dandelion',        icon:'Dandelion.png',          bundle:'Spring Foraging Bundle' },
+      { name:'Cherry',           icon:'Cherry.png',            bundle:'Artisan Bundle', note:'Fruit tree — plant fall/winter!' },
+      { name:'Apricot',          icon:'Apricot.png',           bundle:'Artisan Bundle', note:'Fruit tree — plant fall/winter!' },
+    ],
+    fishing: [
+      { name:'Sunfish',  icon:'Sunfish.png',  bundle:'River Fish Bundle',    note:'River · 6am–7pm' },
+      { name:'Catfish',  icon:'Catfish.png',  bundle:'River Fish Bundle',    note:'River · Rainy · 6am–12am' },
+      { name:'Shad',     icon:'Shad.png',     bundle:'River Fish Bundle',    note:'River · 9am–2am' },
+      { name:'Eel',      icon:'Eel.png',      bundle:'Night Fishing Bundle', note:'Ocean · Rainy · 4pm–2am' },
+      { name:'Sardine',  icon:'Sardine.png',  bundle:'Ocean Fish Bundle',    note:'Ocean · 6am–7pm (Spr/Fall/Win)' },
+    ],
+    todo: [
+      'Plant <span class="hl">fruit trees</span> (Cherry, Apricot, Orange, Peach) — 28 days to mature.',
+      'Set up <span class="hl">Tappers</span> on Oak (resin) and Maple (syrup) trees.',
+      '<span class="hl">Egg Festival Day 13</span> — buy Strawberry Seeds from Pierre.',
+      'Start mining for <span class="hl">Copper & Iron</span> (Blacksmith\'s Bundle).',
+      'Keep all <span class="hl">Spring Foraging</span> items — they\'re gone after Spring 28.',
+      'Upgrade tools to <span class="hl">Copper</span> to reach deeper mine floors.',
+    ]
+  },
+  summer: {
+    plant: [
+      { name:'Tomato',       icon:'Tomato.png',      bundle:'Summer Crops Bundle' },
+      { name:'Hot Pepper',   icon:'Hot_Pepper.png',  bundle:'Summer Crops Bundle' },
+      { name:'Blueberry',    icon:'Blueberry.png',   bundle:'Summer Crops Bundle' },
+      { name:'Melon',        icon:'Melon.png',        bundle:'Summer Crops Bundle' },
+      { name:'Gold Melon ×5',icon:'Melon.png',        bundle:'Quality Crops Bundle', note:'Need gold ★' },
+      { name:'Wheat ×10',    icon:'Wheat.png',        bundle:'Fodder Bundle' },
+      { name:'Sunflower',    icon:'Sunflower.png',    bundle:'Dye Bundle' },
+      { name:'Poppy',        icon:'Poppy.png',        bundle:"Chef's Bundle" },
+      { name:'Red Cabbage',  icon:'Red_Cabbage.png',  bundle:'Dye Bundle', note:'Pierre\'s in Summer only', badge:'year2' },
+      { name:'Hops',         icon:'Hops.png',         bundle:'Artisan → Pale Ale', note:'Keg required' },
+    ],
+    forage: [
+      { name:'Spice Berry',     icon:'Spice_Berry.png',     bundle:'Summer Foraging Bundle' },
+      { name:'Fiddlehead Fern', icon:'Fiddlehead_Fern.png', bundle:"Summer Foraging · Chef's Bundle", note:'Cindersap Forest' },
+      { name:'Red Mushroom',    icon:'Red_Mushroom.png',     bundle:'Summer Foraging + Dye Bundle' },
+      { name:'Grape',           icon:'Grape.png',            bundle:'Summer Foraging Bundle' },
+      { name:'Sea Urchin',      icon:'Sea_Urchin.png',       bundle:'Dye Bundle', note:'Beach · rare', badge:'rare' },
+    ],
+    fishing: [
+      { name:'Pufferfish',      icon:'Pufferfish.png',       bundle:'Specialty Fish Bundle',  note:'Ocean · Sunny · 12pm–4pm' },
+      { name:'Tuna',            icon:'Tuna.png',             bundle:'Ocean Fish Bundle',      note:'Ocean · 6am–7pm (Sum/Win)' },
+      { name:'Red Snapper',     icon:'Red_Snapper.png',      bundle:'Ocean Fish Bundle',      note:'Ocean · Rainy' },
+      { name:'Tilapia',         icon:'Tilapia.png',          bundle:'Ocean Fish Bundle',      note:'Ocean · 6am–2pm (Sum/Fall)' },
+      { name:'Woodskip',        icon:'Woodskip.png',         bundle:'Specialty Fish Bundle',  note:'Secret Woods · Steel Axe needed', badge:'rare' },
+      { name:'Largemouth Bass', icon:'Largemouth_Bass.png',  bundle:'Lake Fish Bundle',       note:'Mountain Lake · any time' },
+      { name:'Ghostfish',       icon:'Ghostfish.png',        bundle:'Specialty Fish Bundle',  note:'Underground Lake · Mine floors 20/60' },
+      { name:'Sandfish',        icon:'Sandfish.png',         bundle:'Specialty Fish Bundle',  note:'Desert · 6am–8pm · unlock Bus first', badge:'rare' },
+    ],
+    todo: [
+      'Set up <span class="hl">Bee Houses</span> for Honey (Artisan Bundle).',
+      'Build <span class="hl">Big Barn</span> → buy Goat for Goat Cheese & Goat Milk.',
+      'Build <span class="hl">Coop</span> → buy Duck for Duck Feather (Dye Bundle).',
+      'Set up <span class="hl">Kegs & Preserve Jars</span> for Artisan items.',
+      'Collect <span class="hl">Oak Resin</span> from Tappers (Enchanter\'s Bundle).',
+      'Collect <span class="hl">Maple Syrup</span> from Tappers (Chef\'s Bundle).',
+      'Mine floors 40–79 for <span class="hl">Frozen Tear & Aquamarine</span>.',
+      'Place <span class="hl">Crab Pots</span> in river/ocean daily (Crab Pot Bundle).',
+    ]
+  },
+  fall: {
+    plant: [
+      { name:'Corn',            icon:'Corn.png',       bundle:'Fall Crops Bundle', note:'Plant in Summer for dual harvest' },
+      { name:'Eggplant',        icon:'Eggplant.png',   bundle:'Fall Crops Bundle' },
+      { name:'Pumpkin',         icon:'Pumpkin.png',    bundle:'Fall Crops Bundle' },
+      { name:'Yam',             icon:'Yam.png',         bundle:'Fall Crops Bundle' },
+      { name:'Gold Pumpkin ×5', icon:'Pumpkin.png',    bundle:'Quality Crops Bundle', note:'Need gold ★' },
+      { name:'Gold Corn ×5',    icon:'Corn.png',       bundle:'Quality Crops Bundle', note:'Need gold ★' },
+      { name:'Cranberries',     icon:'Cranberries.png', bundle:'Artisan → Jelly' },
+      { name:'Grape',           icon:'Grape.png',       bundle:"Artisan + Enchanter's Bundle", note:'Trellis crop' },
+      { name:'Wheat ×10',       icon:'Wheat.png',       bundle:'Fodder Bundle', note:'If missed in Summer' },
+    ],
+    forage: [
+      { name:'Common Mushroom', icon:'Common_Mushroom.png', bundle:'Fall Foraging Bundle' },
+      { name:'Wild Plum',       icon:'Wild_Plum.png',       bundle:'Fall Foraging Bundle' },
+      { name:'Hazelnut',        icon:'Hazelnut.png',         bundle:'Fall Foraging Bundle' },
+      { name:'Blackberry',      icon:'Blackberry.png',       bundle:'Fall Foraging Bundle', note:'Fall 8 — Blackberry Season event' },
+      { name:'Purple Mushroom', icon:'Purple_Mushroom.png',  bundle:'Field Research Bundle', note:'Mine 80+ or Mushroom Cave', badge:'rare' },
+      { name:'Red Mushroom',    icon:'Red_Mushroom.png',     bundle:'Dye Bundle', note:'If missed in Summer' },
+      { name:'Apple',           icon:'Apple.png',            bundle:'Artisan Bundle · Fodder ×3', note:'Fruit tree (Fall)' },
+      { name:'Pomegranate',     icon:'Pomegranate.png',      bundle:"Artisan + Enchanter's Bundle", note:'Fruit tree (Fall)' },
+    ],
+    fishing: [
+      { name:'Catfish',     icon:'Catfish.png',     bundle:'River Fish Bundle',    note:'River · Rainy (also Spring)' },
+      { name:'Walleye',     icon:'Walleye.png',     bundle:'Night Fishing Bundle', note:'River/Lake · Rainy · 12pm–2am' },
+      { name:'Tiger Trout', icon:'Tiger_Trout.png', bundle:'River Fish Bundle',    note:'River · 6am–7pm (Fall/Win)', badge:'rare' },
+      { name:'Red Snapper', icon:'Red_Snapper.png', bundle:'Ocean Fish Bundle',    note:'Ocean · Rainy (also Summer)' },
+    ],
+    todo: [
+      'Collect <span class="hl">Duck Feather</span> — Duck at high friendship (Dye Bundle).',
+      'Collect <span class="hl">Rabbit\'s Foot</span> — Deluxe Coop Rabbit at max friendship (Enchanter\'s Bundle).',
+      'Get <span class="hl">Truffle</span> from Pig before winter — pigs don\'t leave Barn in Winter! (Chef\'s Bundle).',
+      'Process <span class="hl">Truffle Oil</span> in Oil Maker (Artisan Bundle).',
+      'Fill <span class="hl">Kegs with Wine/Juice</span> before crops die on Fall 28.',
+      'Stockpile <span class="hl">Hay × 10</span> for Fodder Bundle.',
+      'Mine floors 80+ for <span class="hl">Gold Bars & Fire Quartz</span>.',
+      'Save up for <span class="hl">Vault Bundles</span> (42,500g total across all four).',
+      'Plant <span class="hl">fruit trees</span> now so they fruit next year.',
+    ]
+  },
+  winter: {
+    plant: [
+      { name:'(Greenhouse only)', icon:'Greenhouse.png', bundle:'Catch up on any missed crops', note:'Unlocked after completing Crafts Room' },
+    ],
+    forage: [
+      { name:'Winter Root',    icon:'Winter_Root.png',    bundle:'Winter Foraging + Field Research Bundle', note:'Till soil' },
+      { name:'Crystal Fruit',  icon:'Crystal_Fruit.png',  bundle:'Winter Foraging Bundle', note:'Forage' },
+      { name:'Snow Yam',       icon:'Snow_Yam.png',       bundle:'Winter Foraging Bundle', note:'Till soil' },
+      { name:'Crocus',         icon:'Crocus.png',          bundle:'Winter Foraging Bundle', note:'Forage' },
+      { name:'Holly',          icon:'Holly.png',           bundle:'Winter Foraging Bundle', note:'Forage' },
+      { name:'Nautilus Shell', icon:'Nautilus_Shell.png',  bundle:'Winter Foraging + Field Research Bundle', note:'Beach' },
+    ],
+    fishing: [
+      { name:'Tuna',            icon:'Tuna.png',              bundle:'Ocean Fish Bundle',    note:'Ocean · 6am–7pm (also Summer)' },
+      { name:'Sturgeon',        icon:'Sturgeon.png',          bundle:'Lake Fish Bundle',     note:'Mountain Lake · 6am–7pm (Sum/Win)' },
+      { name:'Tiger Trout',     icon:'Tiger_Trout.png',       bundle:'River Fish Bundle',    note:'River · 6am–7pm (Fall/Win)' },
+      { name:'Bream',           icon:'Bream.png',             bundle:'Night Fishing Bundle', note:'River · 6pm–2am · any season' },
+      { name:'Carp',            icon:'Carp.png',              bundle:'Lake Fish Bundle',     note:'Mountain Lake · any season' },
+      { name:'Bullhead',        icon:'Bullhead.png',          bundle:'Lake Fish Bundle',     note:'Mountain Lake · any season' },
+      { name:'Largemouth Bass', icon:'Largemouth_Bass.png',   bundle:'Lake Fish Bundle',     note:'Mountain Lake · any season' },
+    ],
+    todo: [
+      'Mine for <span class="hl">Gold Bars</span> — smelt for Blacksmith\'s Bundle (floors 80+).',
+      'Floors 1–39: <span class="hl">Earth Crystal & Quartz</span> (Geologist\'s Bundle).',
+      'Floors 40–79: <span class="hl">Frozen Tear & Aquamarine</span>.',
+      'Floors 80–119: <span class="hl">Fire Quartz</span> (Geologist\'s Bundle).',
+      'Kill <span class="hl">Green Slimes ×99</span> (Adventurer\'s Bundle).',
+      'Kill <span class="hl">Bats ×10</span> for Bat Wings (Adventurer\'s Bundle).',
+      'Kill <span class="hl">Ghosts/Metal Heads</span> for Solar Essence (Adventurer\'s Bundle).',
+      'Kill <span class="hl">Shadow Brutes/Shamans</span> for Void Essence (Adventurer\'s Bundle).',
+      'Check <span class="hl">Traveling Cart</span> (Fri & Sun) for Red Cabbage, Rabbit\'s Foot, etc.',
+      'Set up <span class="hl">Crab Pots</span> — need 5 of: Lobster, Crayfish, Crab, Cockle, Mussel, Shrimp, Snail, Periwinkle, Oyster, Clam.',
+    ]
+  },
+  special: {
+    yearround: [
+      { name:'Copper Bar',      icon:'Copper_Bar.png',      bundle:"Blacksmith's Bundle",  note:'5 Copper Ore → Furnace' },
+      { name:'Iron Bar',        icon:'Iron_Bar.png',        bundle:"Blacksmith's Bundle",  note:'5 Iron Ore → Furnace' },
+      { name:'Gold Bar',        icon:'Gold_Bar.png',        bundle:"Blacksmith's Bundle",  note:'5 Gold Ore → Furnace (floors 80+)' },
+      { name:'Quartz',          icon:'Quartz.png',          bundle:"Geologist's Bundle",   note:'Mine floors 1–39' },
+      { name:'Earth Crystal',   icon:'Earth_Crystal.png',   bundle:"Geologist's Bundle",   note:'Mine floors 1–39' },
+      { name:'Frozen Tear',     icon:'Frozen_Tear.png',     bundle:"Geologist's Bundle",   note:'Mine floors 40–79' },
+      { name:'Fire Quartz',     icon:'Fire_Quartz.png',     bundle:"Geologist's Bundle",   note:'Mine floors 80–119' },
+      { name:'Slime ×99',       icon:'Green_Slime_Egg.png', bundle:"Adventurer's Bundle",  note:'Kill Green Slimes (floors 1–39)' },
+      { name:'Bat Wing ×10',    icon:'Bat_Wing.png',        bundle:"Adventurer's Bundle",  note:'Kill Bats (floors 40–79)' },
+      { name:'Solar Essence',   icon:'Solar_Essence.png',   bundle:"Adventurer's Bundle",  note:'Ghost / Mummy / Metal Head drop' },
+      { name:'Void Essence',    icon:'Void_Essence.png',    bundle:"Adventurer's Bundle",  note:'Shadow Brute / Shaman drop (80+)' },
+      { name:'Large Milk',      icon:'Large_Milk.png',      bundle:'Animal Bundle',        note:'Cow at 8+ hearts, Big Barn' },
+      { name:'Large Egg',       icon:'Large_Egg.png',       bundle:'Animal Bundle',        note:'Chicken at 8+ hearts, Big Coop' },
+      { name:'Large Goat Milk', icon:'Large_Goat_Milk.png', bundle:'Animal Bundle',        note:'Goat at max friendship, Deluxe Barn', badge:'rare' },
+      { name:'Wool',            icon:'Wool.png',            bundle:'Animal Bundle',        note:'Sheep (needs Shears) or Rabbit' },
+      { name:'Duck Egg',        icon:'Duck_Egg.png',        bundle:'Animal Bundle',        note:'Duck in Coop' },
+      { name:'Dinosaur Egg',    icon:'Dinosaur_Egg.png',    bundle:'Animal Bundle',        note:'Skull Cavern, artifact spot, or Dino in Coop', badge:'rare' },
+      { name:'Truffle Oil',     icon:'Truffle_Oil.png',     bundle:'Artisan Bundle',       note:'Truffle → Oil Maker' },
+      { name:'Cloth',           icon:'Cloth.png',           bundle:'Artisan Bundle',       note:'Wool → Loom' },
+      { name:'Goat Cheese',     icon:'Goat_Cheese.png',     bundle:'Artisan Bundle',       note:'Goat Milk → Cheese Press' },
+      { name:'Cheese',          icon:'Cheese.png',          bundle:'Artisan Bundle',       note:'Cow Milk → Cheese Press' },
+      { name:'Honey',           icon:'Honey.png',           bundle:'Artisan Bundle',       note:'Bee House (non-winter)' },
+      { name:'Jelly',           icon:'Jelly.png',           bundle:'Artisan Bundle',       note:'Any Fruit → Preserve Jar' },
+      { name:'Orange',          icon:'Orange.png',          bundle:'Artisan Bundle',       note:'Fruit tree — produces in Summer' },
+      { name:'Peach',           icon:'Peach.png',           bundle:'Artisan Bundle',       note:'Fruit tree — produces in Summer' },
+      { name:'Maple Syrup',     icon:'Maple_Syrup.png',     bundle:"Chef's Bundle",        note:'Tapper on Maple Tree (9-day refresh)' },
+      { name:'Truffle',         icon:'Truffle.png',         bundle:"Chef's Bundle",        note:'Pig (Deluxe Barn) · non-winter only' },
+      { name:'Maki Roll',       icon:'Maki_Roll.png',       bundle:"Chef's Bundle",        note:'Any Fish + Seaweed → Cooking' },
+      { name:'Fried Egg',       icon:'Fried_Egg.png',       bundle:"Chef's Bundle",        note:'Any Egg → Cooking' },
+      { name:'Oak Resin',       icon:'Oak_Resin.png',       bundle:"Enchanter's Bundle",   note:'Tapper on Oak Tree (7-day refresh)' },
+      { name:'Wine',            icon:'Wine.png',            bundle:"Enchanter's Bundle",   note:'Any Fruit → Keg' },
+      { name:"Rabbit's Foot",   icon:"Rabbit's_Foot.png", bundle:"Enchanter's Bundle",   note:'Rabbit at max friendship (Deluxe Coop)', badge:'rare' },
+      { name:'Duck Feather',    icon:'Duck_Feather.png',    bundle:'Dye Bundle',           note:'Duck at high friendship (random drop)' },
+      { name:'Sea Urchin',      icon:'Sea_Urchin.png',      bundle:'Dye Bundle',           note:'Summer beach · rare forage', badge:'rare' },
+      { name:'Sunflower',       icon:'Sunflower.png',       bundle:'Dye Bundle',           note:'Grow in Summer or Fall' },
+      { name:'Aquamarine',      icon:'Aquamarine.png',      bundle:'Dye Bundle',           note:'Mine floors 40–79' },
+      { name:'Red Cabbage',     icon:'Red_Cabbage.png',     bundle:'Dye Bundle',           note:'Pierre\'s Summer (Year 2+) or Traveling Cart', badge:'year2' },
+      { name:'Winter Root',     icon:'Winter_Root.png',     bundle:'Field Research Bundle',note:'Till soil in Winter' },
+      { name:'Nautilus Shell',  icon:'Nautilus_Shell.png',  bundle:'Field Research Bundle',note:'Beach in Winter' },
+      { name:'Purple Mushroom', icon:'Purple_Mushroom.png', bundle:'Field Research Bundle',note:'Mine 80+ or Mushroom Cave (Fall/Winter)', badge:'rare' },
+      { name:'Frozen Geode',    icon:'Frozen_Geode.png',    bundle:'Field Research Bundle',note:'Mine floors 40–79' },
+      { name:'Chub',            icon:'Chub.png',            bundle:'Field Research Bundle',note:'River or Mountain Lake · any season' },
+      { name:'2,500g',          icon:'Gold.png',            bundle:'Vault Bundle 1' },
+      { name:'5,000g',          icon:'Gold.png',            bundle:'Vault Bundle 2' },
+      { name:'10,000g',         icon:'Gold.png',            bundle:'Vault Bundle 3' },
+      { name:'25,000g',         icon:'Gold.png',            bundle:'Vault Bundle 4' },
+      { name:'Lobster',         icon:'Lobster.png',         bundle:'Crab Pot Bundle',      note:'Crab Pot · Ocean' },
+      { name:'Crayfish',        icon:'Crayfish.png',        bundle:'Crab Pot Bundle',      note:'Crab Pot · Freshwater' },
+      { name:'Crab',            icon:'Crab.png',            bundle:'Crab Pot Bundle',      note:'Crab Pot · Ocean' },
+      { name:'Cockle',          icon:'Cockle.png',          bundle:'Crab Pot Bundle',      note:'Crab Pot · Ocean' },
+      { name:'Mussel',          icon:'Mussel.png',          bundle:'Crab Pot Bundle',      note:'Crab Pot · Ocean' },
+      { name:'Shrimp',          icon:'Shrimp.png',          bundle:'Crab Pot Bundle',      note:'Crab Pot · Ocean' },
+      { name:'Snail',           icon:'Snail.png',           bundle:'Crab Pot Bundle',      note:'Crab Pot · Freshwater' },
+      { name:'Periwinkle',      icon:'Periwinkle.png',      bundle:'Crab Pot Bundle',      note:'Crab Pot · Freshwater' },
+      { name:'Oyster',          icon:'Oyster.png',          bundle:'Crab Pot Bundle',      note:'Crab Pot · Ocean' },
+      { name:'Clam',            icon:'Clam.png',            bundle:'Crab Pot Bundle',      note:'Crab Pot · Ocean' },
+    ]
+  }
+};
+
+function key(season, section, name) { return `sdv_${season}_${section}_${name}`; }
+
+function renderItems(items, season, section, container) {
+  items.forEach(item => {
+    const k = key(season, section, item.name);
+    const checked = localStorage.getItem(k) === '1';
+    const row = document.createElement('div');
+    row.className = 'item-row' + (checked ? ' checked' : '');
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = checked;
+
+    const iconEl = document.createElement('img');
+    iconEl.className = 'item-icon';
+    iconEl.src = img(item.icon);
+    iconEl.alt = '';
+    iconEl.onerror = function() { this.style.visibility = 'hidden'; };
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'item-name';
+    nameEl.textContent = item.name;
+
+    const bundleEl = document.createElement('span');
+    bundleEl.className = 'item-bundle';
+    bundleEl.textContent = item.bundle;
+
+    row.appendChild(cb);
+    row.appendChild(iconEl);
+    row.appendChild(nameEl);
+    row.appendChild(bundleEl);
+
+    if (item.badge) {
+      const b = document.createElement('span');
+      b.className = 'badge ' + item.badge;
+      b.textContent = item.badge === 'year2' ? 'Year 2+' : 'Rare';
+      row.appendChild(b);
+    }
+    if (item.note) {
+      const n = document.createElement('span');
+      n.className = 'item-note';
+      n.textContent = item.note;
+      row.appendChild(n);
+    }
+
+    const toggle = (checked) => {
+      localStorage.setItem(k, checked ? '1' : '0');
+      row.classList.toggle('checked', checked);
+      updateProgress();
+    };
+    row.addEventListener('click', e => { if (e.target === cb) return; cb.checked = !cb.checked; toggle(cb.checked); });
+    cb.addEventListener('change', () => toggle(cb.checked));
+    container.appendChild(row);
+  });
+}
+
+function renderSection(title, items, season, section, body, isTodo) {
+  const wrap = document.createElement('div');
+  wrap.className = 'subsection';
+  const titleEl = document.createElement('div');
+  titleEl.className = 'subsection-title';
+  titleEl.textContent = title;
+  const content = document.createElement('div');
+  content.className = 'subsection-content';
+  titleEl.addEventListener('click', () => { titleEl.classList.toggle('collapsed'); content.classList.toggle('hidden'); });
+  if (isTodo) {
+    const ul = document.createElement('ul');
+    ul.className = 'todo-list';
+    items.forEach(t => { const li = document.createElement('li'); li.innerHTML = '→ ' + t; ul.appendChild(li); });
+    content.appendChild(ul);
+  } else {
+    renderItems(items, season, section, content);
+  }
+  wrap.appendChild(titleEl);
+  wrap.appendChild(content);
+  body.appendChild(wrap);
+}
+
+['spring','summer','fall','winter'].forEach(s => {
+  const d = data[s], body = document.getElementById(s + '-body');
+  renderSection('🌱 Plant',   d.plant,   s, 'plant',   body);
+  renderSection('🍃 Forage',  d.forage,  s, 'forage',  body);
+  renderSection('🎣 Fishing', d.fishing, s, 'fishing', body);
+  renderSection('✅ To Do',   d.todo,    s, 'todo',    body, true);
+});
+renderSection('⚙️ Year-Round & Exceptional Items', data.special.yearround, 'special', 'yr', document.getElementById('special-body'));
+
+function updateProgress() {
+  const all = document.querySelectorAll('.item-row'), done = document.querySelectorAll('.item-row.checked');
+  const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+  document.getElementById('prog-label').textContent = `${done.length} / ${all.length} items checked`;
+  document.getElementById('prog-bar').style.width = pct + '%';
+}
+
+function resetAll() {
+  if (!confirm('Reset all checkboxes?')) return;
+  Object.keys(localStorage).filter(k => k.startsWith('sdv_')).forEach(k => localStorage.removeItem(k));
+  document.querySelectorAll('.item-row').forEach(r => { r.classList.remove('checked'); r.querySelector('input').checked = false; });
+  updateProgress();
+}
+
+updateProgress();
+</script>
+</body>
+</html>
